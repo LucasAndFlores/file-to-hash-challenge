@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  image-to-hash:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: image-to-hash:latest
+    container_name: image-to-hash
+    restart: always
+    command: "yarn dev"
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+    ports:
+      - "3000:3000"
+      - "9229:9229"
