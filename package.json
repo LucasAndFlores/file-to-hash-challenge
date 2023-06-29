@@ -1,0 +1,8 @@
+{
+  "name": "image-to-hash-challenge",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:LucasAndFlores/image-to-hash-challenge.git",
+  "author": "lucasandrade <lucas.andrade@roihunter.com>",
+  "license": "MIT"
+}
