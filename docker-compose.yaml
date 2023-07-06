@@ -10,9 +10,20 @@ services:
     restart: always
     command: "yarn dev"
     env_file:
-      - .env
+      - .env.dev
     volumes:
       - ./src:/app/src
     ports:
       - "3000:3000"
       - "9229:9229"
+    depends_on:
+      - mysql-database
+
+  mysql-database:
+    image: mysql:latest
+    container_name: mysql-database
+    restart: always
+    env_file:
+      - .env.dev
+    ports:
+      - "3306:3306"
