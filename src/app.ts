@@ -1,18 +1,16 @@
 import express, { NextFunction, Request, Response } from "express";
 import Container from "typedi";
 import { ImageToHashController } from "./controller/ImageToHashController";
+import { validateHeaderContentType } from "./middleware/validateHeaderContentType";
 const app = express();
 
 app.post(
   "/",
+  validateHeaderContentType,
   async (request: Request, response: Response, next: NextFunction) => {
-    if (request.headers["content-type"]?.includes("multipart/form-data")) {
-      const controller = Container.get(ImageToHashController);
-      await controller.handle(request, response, next);
-    } else {
-      response.status(404);
-      response.end();
-    }
+    const controller = Container.get(ImageToHashController);
+    await controller.handle(request, response, next);
+    return;
   }
 );
 
