@@ -4,3 +4,4 @@ node_modules
 /dist
 .vscode
 yarn-error.log
+/prisma/migrations
