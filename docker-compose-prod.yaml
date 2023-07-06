@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+  image-to-hash-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile-prod
+    image: image-to-hash-prod:latest
+    container_name: image-to-hash-prod
+    restart: "no"
+    command: "yarn start"
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql-database-prod
+
+  mysql-database-prod:
+    image: mysql:latest
+    container_name: mysql-database-prod
+    restart: "no"
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"

@@ -1,0 +1,37 @@
+FROM node:18-slim as ts-compiler
+
+WORKDIR /app
+
+COPY package*.json yarn.lock ./
+
+COPY tsconfig.json tsconfig.build.json ./
+
+RUN yarn install --frozen-lockfile --include=dev
+
+COPY prisma /app/prisma
+
+COPY src /app/src
+
+RUN npx prisma generate
+
+RUN yarn build
+
+FROM node:18-slim as ts-starter
+
+WORKDIR /app
+
+COPY yarn.lock  /app/
+
+COPY --from=ts-compiler /app/package*.json  /app/
+
+COPY prisma /app/prisma
+
+RUN mkdir dist
+
+COPY --from=ts-compiler /app/dist /app/dist
+
+RUN yarn install --prod --frozen-lockfile
+
+EXPOSE 3000
+
+CMD [ "yarn", "start" ]
