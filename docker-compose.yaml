@@ -1,12 +1,12 @@
 version: "3.7"
 
 services:
-  image-to-hash:
+  file-to-hash:
     build:
       context: .
       dockerfile: Dockerfile
-    image: image-to-hash:latest
-    container_name: image-to-hash
+    image: file-to-hash:latest
+    container_name: file-to-hash
     restart: always
     command: "yarn dev"
     env_file:
