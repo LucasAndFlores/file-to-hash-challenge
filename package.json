@@ -15,7 +15,7 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "unit-tests": "jest ./tests/unit",
-    "start": "yarn prepare-prisma && node ./dist/src/index.js",
+    "start": "node ./dist/src/index.js",
     "dev": "nodemon ./src/index.ts",
     "test": "jest",
     "prepare-prisma": "npx prisma migrate dev && npx prisma generate",
