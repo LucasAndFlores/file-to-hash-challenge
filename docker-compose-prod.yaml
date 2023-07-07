@@ -1,12 +1,12 @@
 version: "3.7"
 
 services:
-  image-to-hash-prod:
+  file-to-hash-prod:
     build:
       context: .
       dockerfile: Dockerfile-prod
-    image: image-to-hash-prod:latest
-    container_name: image-to-hash-prod
+    image: file-to-hash-prod:latest
+    container_name: file-to-hash-prod
     restart: "no"
     command: "yarn start"
     env_file:
