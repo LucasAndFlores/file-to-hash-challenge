@@ -2,13 +2,13 @@ import "reflect-metadata";
 
 import { jest } from "@jest/globals";
 
-import { ImageToHashLogic } from "../../src/logic/ImageToHashLogic";
 import Container from "typedi";
 import { createHash } from "crypto";
 import { DatabaseError } from "../../src/error/DatabaseError";
 import { FileToHashRepositoryInMemory } from "../mocks/FileToHashRepositoryInMemory";
+import { FileToHashLogic } from "../../src/logic/FileToHashLogic";
 
-let imageToHashLogic: ImageToHashLogic;
+let fileToHashLogic: FileToHashLogic;
 let fileToHashRepositoryInMemory: FileToHashRepositoryInMemory;
 
 const mockedDate = new Date("2023-07-05T15:02:24.871Z");
@@ -18,7 +18,7 @@ hash.update("test");
 const generatedHash = hash.digest("hex");
 const mockedSize = 1234;
 
-describe("Image to hash logic unit test", () => {
+describe("File to hash logic unit test", () => {
   beforeEach(() => {
     fileToHashRepositoryInMemory = new FileToHashRepositoryInMemory();
 
@@ -31,7 +31,7 @@ describe("Image to hash logic unit test", () => {
     jest.spyOn(Math, "random").mockReturnValue(mockedId);
     jest.spyOn(global, "Date").mockReturnValue(mockedDate);
 
-    imageToHashLogic = new ImageToHashLogic();
+    fileToHashLogic = new FileToHashLogic();
   });
 
   it("Should be able to store a hash and sizeInBytes if the data is not present on the database", async () => {
@@ -52,7 +52,7 @@ describe("Image to hash logic unit test", () => {
       "insert"
     );
 
-    const result = await imageToHashLogic.execute({
+    const result = await fileToHashLogic.execute({
       hash: generatedHash,
       sizeInBytes: mockedSize,
     });
@@ -89,7 +89,7 @@ describe("Image to hash logic unit test", () => {
       "insert"
     );
 
-    const result = await imageToHashLogic.execute({
+    const result = await fileToHashLogic.execute({
       hash: generatedHash,
       sizeInBytes: mockedSize,
     });
@@ -113,7 +113,7 @@ describe("Image to hash logic unit test", () => {
     );
 
     expect(async () => {
-      await imageToHashLogic.execute({
+      await fileToHashLogic.execute({
         hash: generatedHash,
         sizeInBytes: mockedSize,
       });

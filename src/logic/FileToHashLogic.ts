@@ -4,7 +4,7 @@ import Container, { Service } from "typedi";
 import { FileToHashRepository } from "../repository/FileToHashRepository";
 
 @Service()
-export class ImageToHashLogic {
+export class FileToHashLogic {
   private fileToHashRepository: FileToHashRepository;
 
   constructor() {

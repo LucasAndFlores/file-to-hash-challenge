@@ -2,15 +2,15 @@ import { createHash } from "crypto";
 import { NextFunction, Request, Response } from "express";
 import { pipeline } from "stream/promises";
 import Container, { Service } from "typedi";
-import { ImageToHashLogic } from "../logic/ImageToHashLogic";
 import { DatabaseError } from "../error/DatabaseError";
+import { FileToHashLogic } from "../logic/FileToHashLogic";
 
 @Service()
 export class ImageToHashController {
-  logic: ImageToHashLogic;
+  logic: FileToHashLogic;
 
   constructor() {
-    this.logic = Container.get(ImageToHashLogic);
+    this.logic = Container.get(FileToHashLogic);
   }
 
   async handle(request: Request, response: Response, next: NextFunction) {
