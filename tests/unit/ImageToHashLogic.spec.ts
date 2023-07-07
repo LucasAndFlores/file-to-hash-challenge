@@ -3,13 +3,13 @@ import "reflect-metadata";
 import { jest } from "@jest/globals";
 
 import { ImageToHashLogic } from "../../src/logic/ImageToHashLogic";
-import { ImageToHashRepositoryInMemory } from "../mocks/ImageToHashRepositoryInMemory";
 import Container from "typedi";
 import { createHash } from "crypto";
 import { DatabaseError } from "../../src/error/DatabaseError";
+import { FileToHashRepositoryInMemory } from "../mocks/FileToHashRepositoryInMemory";
 
 let imageToHashLogic: ImageToHashLogic;
-let imageToHashRepositoryInMemory: ImageToHashRepositoryInMemory;
+let fileToHashRepositoryInMemory: FileToHashRepositoryInMemory;
 
 const mockedDate = new Date("2023-07-05T15:02:24.871Z");
 const mockedId = 6;
@@ -20,11 +20,11 @@ const mockedSize = 1234;
 
 describe("Image to hash logic unit test", () => {
   beforeEach(() => {
-    imageToHashRepositoryInMemory = new ImageToHashRepositoryInMemory();
+    fileToHashRepositoryInMemory = new FileToHashRepositoryInMemory();
 
     jest.spyOn(Container, "get").mockImplementation((container) => {
-      if (container.name === "ImageToHashRepository") {
-        return imageToHashRepositoryInMemory;
+      if (container.name === "FileToHashRepository") {
+        return fileToHashRepositoryInMemory;
       }
     });
 
@@ -42,13 +42,13 @@ describe("Image to hash logic unit test", () => {
       size_in_bytes: `${mockedSize}`,
     };
 
-    const spyFindMethodImageToHashRepository = jest.spyOn(
-      imageToHashRepositoryInMemory,
+    const spyFindMethodFileToHashRepository = jest.spyOn(
+      fileToHashRepositoryInMemory,
       "find"
     );
 
-    const spyInsertMethodImageToHashRepository = jest.spyOn(
-      imageToHashRepositoryInMemory,
+    const spyInsertMethodFileToHashRepository = jest.spyOn(
+      fileToHashRepositoryInMemory,
       "insert"
     );
 
@@ -58,12 +58,12 @@ describe("Image to hash logic unit test", () => {
     });
 
     expect(result).toStrictEqual(expectedResult);
-    expect(spyFindMethodImageToHashRepository).toHaveBeenCalledTimes(1);
-    expect(spyFindMethodImageToHashRepository).toHaveBeenCalledWith(
+    expect(spyFindMethodFileToHashRepository).toHaveBeenCalledTimes(1);
+    expect(spyFindMethodFileToHashRepository).toHaveBeenCalledWith(
       generatedHash
     );
-    expect(spyInsertMethodImageToHashRepository).toHaveBeenCalledTimes(1);
-    expect(spyInsertMethodImageToHashRepository).toHaveBeenCalledWith(
+    expect(spyInsertMethodFileToHashRepository).toHaveBeenCalledTimes(1);
+    expect(spyInsertMethodFileToHashRepository).toHaveBeenCalledWith(
       generatedHash,
       mockedSize
     );
@@ -77,15 +77,15 @@ describe("Image to hash logic unit test", () => {
       size_in_bytes: `${mockedSize}`,
     };
 
-    await imageToHashRepositoryInMemory.insert(generatedHash, mockedSize);
+    await fileToHashRepositoryInMemory.insert(generatedHash, mockedSize);
 
-    const spyFindMethodImageToHashRepository = jest.spyOn(
-      imageToHashRepositoryInMemory,
+    const spyFindMethodFileToHashRepository = jest.spyOn(
+      fileToHashRepositoryInMemory,
       "find"
     );
 
-    const spyInsertMethodImageToHashRepository = jest.spyOn(
-      imageToHashRepositoryInMemory,
+    const spyInsertMethodFileToHashRepository = jest.spyOn(
+      fileToHashRepositoryInMemory,
       "insert"
     );
 
@@ -95,20 +95,20 @@ describe("Image to hash logic unit test", () => {
     });
 
     expect(result).toStrictEqual(expectedResult);
-    expect(spyFindMethodImageToHashRepository).toHaveBeenCalledTimes(1);
-    expect(spyFindMethodImageToHashRepository).toHaveBeenCalledWith(
+    expect(spyFindMethodFileToHashRepository).toHaveBeenCalledTimes(1);
+    expect(spyFindMethodFileToHashRepository).toHaveBeenCalledWith(
       generatedHash
     );
-    expect(spyInsertMethodImageToHashRepository).not.toHaveBeenCalled();
+    expect(spyInsertMethodFileToHashRepository).not.toHaveBeenCalled();
   });
 
   it("If an error happens inside the repository, the error should be propagated to the controller", async () => {
-    jest.spyOn(imageToHashRepositoryInMemory, "find").mockImplementation(() => {
+    jest.spyOn(fileToHashRepositoryInMemory, "find").mockImplementation(() => {
       throw new DatabaseError("error in repository");
     });
 
-    const spyFindMethodImageToHashRepository = jest.spyOn(
-      imageToHashRepositoryInMemory,
+    const spyFindMethodFileToHashRepository = jest.spyOn(
+      fileToHashRepositoryInMemory,
       "find"
     );
 
@@ -118,6 +118,6 @@ describe("Image to hash logic unit test", () => {
         sizeInBytes: mockedSize,
       });
     }).rejects.toBeInstanceOf(DatabaseError);
-    expect(spyFindMethodImageToHashRepository).toHaveBeenCalledTimes(1);
+    expect(spyFindMethodFileToHashRepository).toHaveBeenCalledTimes(1);
   });
 });

@@ -4,8 +4,8 @@ import { jest } from "@jest/globals";
 
 import supertest from "supertest";
 import { app } from "../../src/app";
-import { ImageToHashRepository } from "../../src/repository/ImageToHashRepository";
 import { DatabaseError } from "../../src/error/DatabaseError";
+import { FileToHashRepository } from "../../src/repository/FileToHashRepository";
 
 describe("Integration test post route", () => {
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe("Integration test post route", () => {
 
   it("If happens an known database error on the method find at the repository layer, the status code from the response should be 503", async () => {
     jest
-      .spyOn(ImageToHashRepository.prototype, "find")
+      .spyOn(FileToHashRepository.prototype, "find")
       .mockImplementationOnce(() => {
         throw new DatabaseError("An error happened");
       });
@@ -58,7 +58,7 @@ describe("Integration test post route", () => {
 
   it("If happens an unknown database error on the method find at the repository layer, the status code from the response should be 500", async () => {
     jest
-      .spyOn(ImageToHashRepository.prototype, "find")
+      .spyOn(FileToHashRepository.prototype, "find")
       .mockImplementationOnce(() => {
         throw new Error("An error happened");
       });
@@ -73,7 +73,7 @@ describe("Integration test post route", () => {
 
   it("If happens a known database error on the method insert at the repository layer, the status code from the response should be 503", async () => {
     jest
-      .spyOn(ImageToHashRepository.prototype, "insert")
+      .spyOn(FileToHashRepository.prototype, "insert")
       .mockImplementationOnce(() => {
         throw new DatabaseError("An error happened");
       });
@@ -87,7 +87,7 @@ describe("Integration test post route", () => {
 
   it("If happens an unknown database error on the method insert at the repository layer, the status code from the response should be 500", async () => {
     jest
-      .spyOn(ImageToHashRepository.prototype, "insert")
+      .spyOn(FileToHashRepository.prototype, "insert")
       .mockImplementationOnce(() => {
         throw new Error("An error happened");
       });

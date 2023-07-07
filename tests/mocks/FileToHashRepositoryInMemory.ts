@@ -1,15 +1,15 @@
 import { DatabaseError } from "../../src/error/DatabaseError";
-import { IImageToHashRepository } from "../../src/interface/IImageToHashRepository";
-import { Prisma, image_to_hash } from "@prisma/client";
+import { IFileToHashRepository } from "../../src/interface/IFileToHashRepository";
+import { Prisma, file_to_hash } from "@prisma/client";
 
-export class ImageToHashRepositoryInMemory implements IImageToHashRepository {
-  private database: Map<string, image_to_hash>;
+export class FileToHashRepositoryInMemory implements IFileToHashRepository {
+  private database: Map<string, file_to_hash>;
 
   constructor() {
     this.database = new Map();
   }
 
-  find(hash: string): Promise<image_to_hash | null> {
+  find(hash: string): Promise<file_to_hash | null> {
     try {
       const found = this.database.get(hash);
 
@@ -17,7 +17,7 @@ export class ImageToHashRepositoryInMemory implements IImageToHashRepository {
         return null as unknown as Promise<null>;
       }
 
-      return found as unknown as Promise<image_to_hash>;
+      return found as unknown as Promise<file_to_hash>;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new DatabaseError(
@@ -29,7 +29,7 @@ export class ImageToHashRepositoryInMemory implements IImageToHashRepository {
     }
   }
 
-  insert(hash: string, sizeInBytes: number): Promise<image_to_hash> {
+  insert(hash: string, sizeInBytes: number): Promise<file_to_hash> {
     try {
       this.database.set(hash, {
         id: Math.random(),
@@ -38,7 +38,7 @@ export class ImageToHashRepositoryInMemory implements IImageToHashRepository {
         createdAt: new Date(),
       });
 
-      return this.database.get(hash) as unknown as Promise<image_to_hash>;
+      return this.database.get(hash) as unknown as Promise<file_to_hash>;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new DatabaseError(

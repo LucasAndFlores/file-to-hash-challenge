@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model image_to_hash {
+model file_to_hash {
   id        Int      @id @default(autoincrement())
   hash      String   @unique 
   createdAt DateTime @default(now())
