@@ -6,7 +6,7 @@ import { DatabaseError } from "../error/DatabaseError";
 import { FileToHashLogic } from "../logic/FileToHashLogic";
 
 @Service()
-export class ImageToHashController {
+export class FileToHashController {
   logic: FileToHashLogic;
 
   constructor() {
