@@ -32,6 +32,8 @@ COPY --from=ts-compiler /app/dist /app/dist
 
 RUN yarn install --prod --frozen-lockfile
 
+RUN apt-get update -y && apt-get install -y openssl
+
 EXPOSE 3000
 
 CMD [ "yarn", "start" ]
