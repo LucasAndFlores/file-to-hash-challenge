@@ -1,5 +1,5 @@
 # File to hash challenge
-The main purpose of this repository is to be able to receive a file using a `POST` endpoint, generate a hash from the file, and then collect the size of the file. The hash and the size should be stored on the database and the user should receive this information as a response. The file could have a 1 or 100GB size and should not be saved on disk.
+The main purpose of this repository is to be able to receive a file using a `POST` endpoint with the `multipart/form-data` content-type, generate a hash from the file, and then collect the size of the file. The hash and the size should be stored on the database and the user should receive this information as a response. The file could have a 1 or 100GB size and should not be saved on disk.
 
 This service uses some advanced concepts from Node Js (such as streams and pipelines) to process the file by demand.
 
