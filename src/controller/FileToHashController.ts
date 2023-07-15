@@ -1,17 +1,11 @@
 import { createHash } from "crypto";
 import { NextFunction, Request, Response } from "express";
 import { pipeline } from "stream/promises";
-import Container, { Service } from "typedi";
 import { DatabaseError } from "../error/DatabaseError";
 import { FileToHashLogic } from "../logic/FileToHashLogic";
 
-@Service()
 export class FileToHashController {
-  logic: FileToHashLogic;
-
-  constructor() {
-    this.logic = Container.get(FileToHashLogic);
-  }
+  constructor(private logic: FileToHashLogic) {}
 
   async handle(request: Request, response: Response, next: NextFunction) {
     try {
@@ -27,7 +21,7 @@ export class FileToHashController {
             yield data;
           }
         },
-        hash
+        hash,
       );
 
       const generatedHash = hash.digest("hex");

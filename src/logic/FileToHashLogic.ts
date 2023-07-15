@@ -1,15 +1,9 @@
 import { file_to_hash } from "@prisma/client";
 import { IDataFromController } from "../interface/IDataFromController";
-import Container, { Service } from "typedi";
-import { FileToHashRepository } from "../repository/FileToHashRepository";
+import { IFileToHashRepository } from "../interface/IFileToHashRepository";
 
-@Service()
 export class FileToHashLogic {
-  private fileToHashRepository: FileToHashRepository;
-
-  constructor() {
-    this.fileToHashRepository = Container.get(FileToHashRepository);
-  }
+  constructor(private fileToHashRepository: IFileToHashRepository) {}
   async execute({
     hash,
     sizeInBytes,

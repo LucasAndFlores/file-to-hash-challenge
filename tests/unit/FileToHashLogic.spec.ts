@@ -1,8 +1,5 @@
-import "reflect-metadata";
-
 import { jest } from "@jest/globals";
 
-import Container from "typedi";
 import { createHash } from "crypto";
 import { DatabaseError } from "../../src/error/DatabaseError";
 import { FileToHashRepositoryInMemory } from "../mocks/FileToHashRepositoryInMemory";
@@ -21,17 +18,10 @@ const mockedSize = 1234;
 describe("File to hash logic unit test", () => {
   beforeEach(() => {
     fileToHashRepositoryInMemory = new FileToHashRepositoryInMemory();
-
-    jest.spyOn(Container, "get").mockImplementation((container) => {
-      if (container.name === "FileToHashRepository") {
-        return fileToHashRepositoryInMemory;
-      }
-    });
-
     jest.spyOn(Math, "random").mockReturnValue(mockedId);
     jest.spyOn(global, "Date").mockReturnValue(mockedDate);
 
-    fileToHashLogic = new FileToHashLogic();
+    fileToHashLogic = new FileToHashLogic(fileToHashRepositoryInMemory);
   });
 
   it("Should be able to store a hash and sizeInBytes if the data is not present on the database", async () => {
@@ -44,12 +34,12 @@ describe("File to hash logic unit test", () => {
 
     const spyFindMethodFileToHashRepository = jest.spyOn(
       fileToHashRepositoryInMemory,
-      "find"
+      "find",
     );
 
     const spyInsertMethodFileToHashRepository = jest.spyOn(
       fileToHashRepositoryInMemory,
-      "insert"
+      "insert",
     );
 
     const result = await fileToHashLogic.execute({
@@ -60,12 +50,12 @@ describe("File to hash logic unit test", () => {
     expect(result).toStrictEqual(expectedResult);
     expect(spyFindMethodFileToHashRepository).toHaveBeenCalledTimes(1);
     expect(spyFindMethodFileToHashRepository).toHaveBeenCalledWith(
-      generatedHash
+      generatedHash,
     );
     expect(spyInsertMethodFileToHashRepository).toHaveBeenCalledTimes(1);
     expect(spyInsertMethodFileToHashRepository).toHaveBeenCalledWith(
       generatedHash,
-      mockedSize
+      mockedSize,
     );
   });
 
@@ -81,12 +71,12 @@ describe("File to hash logic unit test", () => {
 
     const spyFindMethodFileToHashRepository = jest.spyOn(
       fileToHashRepositoryInMemory,
-      "find"
+      "find",
     );
 
     const spyInsertMethodFileToHashRepository = jest.spyOn(
       fileToHashRepositoryInMemory,
-      "insert"
+      "insert",
     );
 
     const result = await fileToHashLogic.execute({
@@ -97,7 +87,7 @@ describe("File to hash logic unit test", () => {
     expect(result).toStrictEqual(expectedResult);
     expect(spyFindMethodFileToHashRepository).toHaveBeenCalledTimes(1);
     expect(spyFindMethodFileToHashRepository).toHaveBeenCalledWith(
-      generatedHash
+      generatedHash,
     );
     expect(spyInsertMethodFileToHashRepository).not.toHaveBeenCalled();
   });
@@ -109,7 +99,7 @@ describe("File to hash logic unit test", () => {
 
     const spyFindMethodFileToHashRepository = jest.spyOn(
       fileToHashRepositoryInMemory,
-      "find"
+      "find",
     );
 
     expect(async () => {

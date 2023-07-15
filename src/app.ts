@@ -1,17 +1,16 @@
 import express, { NextFunction, Request, Response } from "express";
-import Container from "typedi";
 import { validateHeaderContentType } from "./middleware/validateHeaderContentType";
-import { FileToHashController } from "./controller/FileToHashController";
+import { FileToHashFactory } from "./factory/FileToHashFactory";
 const app = express();
+const controller = FileToHashFactory.build();
 
 app.post(
   "/",
   validateHeaderContentType,
   async (request: Request, response: Response, next: NextFunction) => {
-    const controller = Container.get(FileToHashController);
     await controller.handle(request, response, next);
     return;
-  }
+  },
 );
 
 export { app };

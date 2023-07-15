@@ -1,5 +1,3 @@
-import "reflect-metadata";
-
 import { jest } from "@jest/globals";
 
 import supertest from "supertest";

@@ -1,9 +1,7 @@
 import { Prisma, PrismaClient, file_to_hash } from "@prisma/client";
-import { Service } from "typedi";
 import { DatabaseError } from "../error/DatabaseError";
 import { IFileToHashRepository } from "../interface/IFileToHashRepository";
 
-@Service()
 export class FileToHashRepository implements IFileToHashRepository {
   private prismaClient: PrismaClient;
 
@@ -19,7 +17,7 @@ export class FileToHashRepository implements IFileToHashRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new DatabaseError(
-          `A prisma error happened on find method: ${error.message}`
+          `A prisma error happened on find method: ${error.message}`,
         );
       } else {
         throw error;
@@ -38,7 +36,7 @@ export class FileToHashRepository implements IFileToHashRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw new DatabaseError(
-          `A prisma error happened on insert method: ${error.message}`
+          `A prisma error happened on insert method: ${error.message}`,
         );
       } else {
         throw error;
