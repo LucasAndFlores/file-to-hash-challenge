@@ -26,8 +26,6 @@ export class FileToHashLogic {
 
     const found = await this.fileToHashRepository.find(generatedHash);
 
-    console.log("found in logic", { found, generatedHash });
-
     if (found === null) {
       return await this.fileToHashRepository.insert(generatedHash, sizeInBytes);
     }
