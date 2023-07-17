@@ -1,17 +1,35 @@
 import { file_to_hash } from "@prisma/client";
-import { IDataFromController } from "../interface/IDataFromController";
+import { pipeline } from "stream/promises";
+import { createHash } from "crypto";
 import { IFileToHashRepository } from "../interface/IFileToHashRepository";
+import { Readable } from "stream";
 
 export class FileToHashLogic {
   constructor(private fileToHashRepository: IFileToHashRepository) {}
-  async execute({
-    hash,
-    sizeInBytes,
-  }: IDataFromController): Promise<file_to_hash> {
-    const found = await this.fileToHashRepository.find(hash);
+  async execute(request: Readable): Promise<file_to_hash> {
+    const hash = createHash("sha1");
+
+    let sizeInBytes = 0;
+
+    await pipeline(
+      request,
+      async function* (stream) {
+        for await (const data of stream) {
+          sizeInBytes += data.length;
+          yield data;
+        }
+      },
+      hash,
+    );
+
+    const generatedHash = hash.digest("hex");
+
+    const found = await this.fileToHashRepository.find(generatedHash);
+
+    console.log("found in logic", { found, generatedHash });
 
     if (found === null) {
-      return await this.fileToHashRepository.insert(hash, sizeInBytes);
+      return await this.fileToHashRepository.insert(generatedHash, sizeInBytes);
     }
 
     return found;

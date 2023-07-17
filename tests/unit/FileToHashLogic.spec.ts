@@ -4,16 +4,38 @@ import { createHash } from "crypto";
 import { DatabaseError } from "../../src/error/DatabaseError";
 import { FileToHashRepositoryInMemory } from "../mocks/FileToHashRepositoryInMemory";
 import { FileToHashLogic } from "../../src/logic/FileToHashLogic";
+import { Readable } from "stream";
+import { pipeline } from "stream/promises";
 
 let fileToHashLogic: FileToHashLogic;
 let fileToHashRepositoryInMemory: FileToHashRepositoryInMemory;
 
 const mockedDate = new Date("2023-07-05T15:02:24.871Z");
 const mockedId = 6;
-const hash = createHash("sha1");
-hash.update("test");
-const generatedHash = hash.digest("hex");
-const mockedSize = 1234;
+
+async function generateHashAndSizeInBytes() {
+  const hash = createHash("sha1");
+
+  let sizeInBytes = 0;
+
+  await pipeline(
+    Readable.from(["unit_test"]),
+    async function* (stream) {
+      for await (const data of stream) {
+        sizeInBytes += data.length;
+        yield data;
+      }
+    },
+    hash,
+  );
+
+  const generatedHash = hash.digest("hex");
+
+  return {
+    hash: generatedHash,
+    sizeInBytes,
+  };
+}
 
 describe("File to hash logic unit test", () => {
   beforeEach(() => {
@@ -25,11 +47,15 @@ describe("File to hash logic unit test", () => {
   });
 
   it("Should be able to store a hash and sizeInBytes if the data is not present on the database", async () => {
+    const mockedReadableStream = Readable.from(["unit_test"]);
+
+    const { hash, sizeInBytes } = await generateHashAndSizeInBytes();
+
     const expectedResult = {
       createdAt: mockedDate,
-      hash: generatedHash,
+      hash: hash,
       id: mockedId,
-      size_in_bytes: `${mockedSize}`,
+      size_in_bytes: `${sizeInBytes}`,
     };
 
     const spyFindMethodFileToHashRepository = jest.spyOn(
@@ -42,32 +68,31 @@ describe("File to hash logic unit test", () => {
       "insert",
     );
 
-    const result = await fileToHashLogic.execute({
-      hash: generatedHash,
-      sizeInBytes: mockedSize,
-    });
+    const result = await fileToHashLogic.execute(mockedReadableStream);
 
     expect(result).toStrictEqual(expectedResult);
     expect(spyFindMethodFileToHashRepository).toHaveBeenCalledTimes(1);
-    expect(spyFindMethodFileToHashRepository).toHaveBeenCalledWith(
-      generatedHash,
-    );
+    expect(spyFindMethodFileToHashRepository).toHaveBeenCalledWith(hash);
     expect(spyInsertMethodFileToHashRepository).toHaveBeenCalledTimes(1);
     expect(spyInsertMethodFileToHashRepository).toHaveBeenCalledWith(
-      generatedHash,
-      mockedSize,
+      hash,
+      sizeInBytes,
     );
   });
 
   it("Should be able to get a database record if it is already present", async () => {
+    const mockedReadableStream = Readable.from(["unit_test"]);
+
+    const { hash, sizeInBytes } = await generateHashAndSizeInBytes();
+
     const expectedResult = {
       createdAt: mockedDate,
-      hash: generatedHash,
+      hash: hash,
       id: mockedId,
-      size_in_bytes: `${mockedSize}`,
+      size_in_bytes: `${sizeInBytes}`,
     };
 
-    await fileToHashRepositoryInMemory.insert(generatedHash, mockedSize);
+    await fileToHashRepositoryInMemory.insert(hash, sizeInBytes);
 
     const spyFindMethodFileToHashRepository = jest.spyOn(
       fileToHashRepositoryInMemory,
@@ -79,35 +104,23 @@ describe("File to hash logic unit test", () => {
       "insert",
     );
 
-    const result = await fileToHashLogic.execute({
-      hash: generatedHash,
-      sizeInBytes: mockedSize,
-    });
+    const result = await fileToHashLogic.execute(mockedReadableStream);
 
     expect(result).toStrictEqual(expectedResult);
     expect(spyFindMethodFileToHashRepository).toHaveBeenCalledTimes(1);
-    expect(spyFindMethodFileToHashRepository).toHaveBeenCalledWith(
-      generatedHash,
-    );
+    expect(spyFindMethodFileToHashRepository).toHaveBeenCalledWith(hash);
     expect(spyInsertMethodFileToHashRepository).not.toHaveBeenCalled();
   });
 
   it("If an error happens inside the repository, the error should be propagated to the controller", async () => {
+    const mockedReadableStream = Readable.from(["unit_test"]);
+
     jest.spyOn(fileToHashRepositoryInMemory, "find").mockImplementation(() => {
       throw new DatabaseError("error in repository");
     });
 
-    const spyFindMethodFileToHashRepository = jest.spyOn(
-      fileToHashRepositoryInMemory,
-      "find",
-    );
-
     expect(async () => {
-      await fileToHashLogic.execute({
-        hash: generatedHash,
-        sizeInBytes: mockedSize,
-      });
+      await fileToHashLogic.execute(mockedReadableStream);
     }).rejects.toBeInstanceOf(DatabaseError);
-    expect(spyFindMethodFileToHashRepository).toHaveBeenCalledTimes(1);
   });
 });

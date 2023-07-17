@@ -7,8 +7,8 @@ const controller = FileToHashFactory.build();
 app.post(
   "/",
   validateHeaderContentType,
-  async (request: Request, response: Response, next: NextFunction) => {
-    await controller.handle(request, response, next);
+  async (request: Request, response: Response) => {
+    await controller.handle(request, response);
     return;
   },
 );

@@ -1,34 +1,13 @@
-import { createHash } from "crypto";
-import { NextFunction, Request, Response } from "express";
-import { pipeline } from "stream/promises";
+import { Request, Response } from "express";
 import { DatabaseError } from "../error/DatabaseError";
 import { FileToHashLogic } from "../logic/FileToHashLogic";
 
 export class FileToHashController {
   constructor(private logic: FileToHashLogic) {}
 
-  async handle(request: Request, response: Response, next: NextFunction) {
+  async handle(request: Request, response: Response) {
     try {
-      const hash = createHash("sha1");
-
-      let sizeInBytes = 0;
-
-      await pipeline(
-        request,
-        async function* (stream) {
-          for await (const data of stream) {
-            sizeInBytes += data.length;
-            yield data;
-          }
-        },
-        hash,
-      );
-
-      const generatedHash = hash.digest("hex");
-      const result = await this.logic.execute({
-        hash: generatedHash,
-        sizeInBytes,
-      });
+      const result = await this.logic.execute(request);
 
       response.json({ hash: result.hash, size: result.size_in_bytes });
     } catch (error) {
